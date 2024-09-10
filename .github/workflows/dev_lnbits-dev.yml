@@ -22,16 +22,24 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Create and start virtual environment
+      - name: Install Poetry
         run: |
-          python -m venv venv
-          source venv/bin/activate
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "Poetry installed successfully."
       
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-
+      - name: Install dependencies with Poetry
+        run: |
+          poetry install --no-root
+      
+      - name: Run Makefile tasks (Optional)
+        run: |
+          make <your-task>  # Replace <your-task> with the actual target you want to run, e.g., 'make build'
+      
+      # Optional: Add step to run tests here (e.g., PyTest)
+      # Example:
+      # - name: Run tests
+      #   run: poetry run pytest
+      
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
 
@@ -61,7 +69,6 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -75,4 +82,3 @@ jobs:
         with:
           app-name: 'lnbits-dev'
           slot-name: 'Production'
-          
